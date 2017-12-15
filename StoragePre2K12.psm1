@@ -30,7 +30,7 @@ function Get-Disk {
             continue
         }
 
-        return [pscustomobject] @{
+        [pscustomobject] @{
             PartitionStyle     = ($DiskPart | where DiskNumber -eq $Disk.Index).PartitionStyle
             OperationalStatus  = ($DiskPart | where DiskNumber -eq $Disk.Index).DetailStatus;
             BusType            = ($DiskPart | where DiskNumber -eq $Disk.Index).DetailType;
@@ -120,7 +120,7 @@ function Get-Partition {
             continue
         }
 
-        return [pscustomobject]@{
+        [pscustomobject]@{
             DiskNumber      = $Partition.DiskNumber
             PartitionNumber = $Partition.PartitionNumber
             DriveLetter     = $FoundDriveLetter
@@ -181,7 +181,7 @@ function Get-PartitionSupportedSize {
     }
 
     foreach ($Part in $Parts) {
-        return [pscustomobject]@{
+        [pscustomobject]@{
             SizeMax = $($PartitionSize = $_.Size - $_.StartingOffset
                 $DiskSize = ($Disks | where { $_.Index -eq $part.diskIndex }).size
                 if (($parts | where Diskindex -eq $part.diskindex | measure -Maximum index).maximum -eq $Part.Index) {
@@ -220,7 +220,7 @@ function Get-Volume {
                 continue
             }
 
-            return $_
+            $_
         }
     }
 }
@@ -415,7 +415,7 @@ function New-Partition {
     Catch {
         Write-Error $_
     }
-    return Get-Partition -DiskNumber $DiskNumber -PartitionNumber $PartNumber
+    Get-Partition -DiskNumber $DiskNumber -PartitionNumber $PartNumber
 }
 function Resize-Partition {
     [cmdletbinding()]

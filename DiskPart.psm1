@@ -192,7 +192,7 @@ function Get-DiskPartPartition {
                 }
 
                 foreach ($part in $PartObj) {
-                    return [pscustomobject]@{
+                      [pscustomobject]@{
                         ComputerName    = $part.ComputerName
                         PartitionNumber = $part.PartitionNumber
                         DiskNumber      = $part.DiskNumber
