@@ -9,7 +9,8 @@ function Get-Disk {
         [string]
         $SerialNumber,
 
-        [parameter()]
+        [parameter(ValueFromPipelineByPropertyName)]
+        [Alias("DiskNumber")]
         [int32]
         $Number
     )
@@ -28,6 +29,11 @@ function Get-Disk {
 
         if ($PSBoundParameters.ContainsKey("FriendlyName") -and $FriendlyName -ne $Disk.Caption) {
             continue
+        }
+
+        $loc = ($DiskPart | where DiskNumber -eq $Disk.Index).LocationPath
+        if ($loc -imatch '^pciroot\((?<adapter>\d+)\).+p(?<port>\d+)t(?<target>\d+)L(?<lun>\d+)' ) {
+            $Location = "PCI Slot : Adapter $([int]$matches["adapter"]) : Port $([int]$matches["port"]) : Target $([int]$matches["target"]) : LUN $([int]$matches["lun"])"
         }
 
         [pscustomobject] @{
@@ -67,7 +73,7 @@ function Get-Disk {
             else {
                 $false
             }
-            Location           = ($DiskPart | where DiskNumber -eq $Disk.Index).LocationPath
+            Location           = $Location
             LogicalSectorSize  = $Disk.BytesPerSector
             FreeSpace          = ($DiskPart | where DiskNumber -eq $Disk.Index).Free
             Manufacturer       = $Disk.Manufacturer
@@ -83,31 +89,24 @@ function Get-Disk {
 function Get-Partition {
     [cmdletbinding()]
     param(
-        [parameter()]
+        [parameter(ValueFromPipelineByPropertyName)]
+        [Alias("Number")]
         [int32]
         $DiskNumber,
 
-        [parameter()]
+        [parameter(ValueFromPipelineByPropertyName)]
         [int32]
         $PartitionNumber,
 
         [parameter()]
         [char]
-        $DriveLetter,
-
-        [Parameter(ValueFromPipeline = $True)]
-        [int32]
-        $Disk
+        $DriveLetter
     )
 
     $Partitions = Get-DiskPartPartition
     $Vols = Get-Volume
 
-    if ($Disk) {
-        $DiskNumber = $Disk.Number
-    }
-
-    if ($PSBoundParameters.ContainsKey("DiskNumber")) {
+    if ($DiskNumber) {
         $Partitions = $Partitions | where { $_.DiskNumber -eq $DiskNumber }
     }
     if ($PSBoundParameters.ContainsKey("PartitionNumber")) {
@@ -420,11 +419,11 @@ function New-Partition {
 function Resize-Partition {
     [cmdletbinding()]
     param(
-        [parameter(Mandatory)]
+        [parameter(Mandatory, ValueFromPipelineByPropertyName)]
         [int]
         $DiskNumber,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
         [int]
         $PartitionNumber,
 
@@ -448,6 +447,6 @@ function Update-HostStorageCache {
     param()
 
     process {
-        "refresh" | diskpart
+        "rescan" | diskpart | Out-Null
     }
 }
