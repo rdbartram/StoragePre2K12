@@ -106,7 +106,7 @@ function Get-Partition {
     $Partitions = Get-DiskPartPartition
     $Vols = Get-Volume
 
-    if ($DiskNumber) {
+    if ($PSBoundParameters.ContainsKey("DiskNumber")) {
         $Partitions = $Partitions | where { $_.DiskNumber -eq $DiskNumber }
     }
     if ($PSBoundParameters.ContainsKey("PartitionNumber")) {
@@ -160,17 +160,14 @@ function Get-PartitionSupportedSize {
     )
 
     $Disks = Get-CimInstance -ClassName Win32_DiskDrive
-
-    if ($DiskNumber) {
-        $Disks = $Disks | where { $_.Index -eq $DiskNumber }
-    }
-
     $Parts = Get-CimInstance -ClassName Win32_DiskPartition
-    if ($DiskNumber) {
+
+    if ($PSBoundParameters.ContainsKey("DiskNumber")) {
+        $Disks = $Disks | where { $_.Index -eq $DiskNumber }
         $Parts = $Parts | where { $_.DiskIndex -eq $DiskNumber }
     }
 
-    if ($PartitionNumber) {
+    if ($PSBoundParameters.ContainsKey("PartitionNumber")) {
         $Parts = $parts | where { if ($_.type -like "*gpt*") {
                 $_.index -eq $PartitionNumber - 2
             }
