@@ -314,7 +314,7 @@ function Get-DiskPartVolume {
             }
 
             $Vol = $null; $Mounts = @()
-            ForEach ($Line in $Output.Split([environment]::NewLine)) {
+            ForEach ($Line in $Output) {
                 If ($Line -match "^[*] Volume \d") {
                     $Vol = $Line
                     $Mounts = @()
