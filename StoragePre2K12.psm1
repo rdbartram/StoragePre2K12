@@ -10,6 +10,7 @@ function Get-Disk {
         $SerialNumber,
 
         [parameter(ValueFromPipelineByPropertyName=$true)]
+        [Alias("DiskNumber")]
         [int32]
         $Number
     )
