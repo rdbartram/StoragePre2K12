@@ -9,13 +9,13 @@ function Get-Disk {
         [string]
         $SerialNumber,
 
-        [parameter(ValueFromPipelineByPropertyName)]
+        [parameter(ValueFromPipelineByPropertyName=$true)]
         [Alias("DiskNumber")]
         [int32]
         $Number
     )
 
-    $Disks = Get-CimInstance -ClassName Win32_DiskDrive
+    $Disks = Get-WmiObject Win32_DiskDrive
     $DiskPart = Get-DiskPartDisk
 
     foreach ($Disk in $Disks) {
@@ -31,70 +31,71 @@ function Get-Disk {
             continue
         }
 
-        $loc = ($DiskPart | where DiskNumber -eq $Disk.Index).LocationPath
+        $loc = ($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).LocationPath
         if ($loc -imatch '^pciroot\((?<adapter>\d+)\).+p(?<port>\d+)t(?<target>\d+)L(?<lun>\d+)' ) {
             $Location = "PCI Slot : Adapter $([int]$matches["adapter"]) : Port $([int]$matches["port"]) : Target $([int]$matches["target"]) : LUN $([int]$matches["lun"])"
         }
 
-        [pscustomobject] @{
-            PartitionStyle     = ($DiskPart | where DiskNumber -eq $Disk.Index).PartitionStyle
-            OperationalStatus  = ($DiskPart | where DiskNumber -eq $Disk.Index).DetailStatus;
-            BusType            = ($DiskPart | where DiskNumber -eq $Disk.Index).DetailType;
-            BootFromDisk       = if (($DiskPart | where DiskNumber -eq $Disk.Index).BootDisk -eq "Yes") {
+        $OutPut = New-Object PSObject
+        $OutPut | Add-Member -MemberType NoteProperty -Name "PartitionStyle" -Value ($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).PartitionStyle
+        $OutPut | Add-Member -MemberType NoteProperty -Name "OperationalStatus" -Value ($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).DetailStatus
+        $OutPut | Add-Member -MemberType NoteProperty -Name "BusType" -Value ($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).DetailType
+        $OutPut | Add-Member -MemberType NoteProperty -Name "BootFromDisk" -Value $(if (($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).BootDisk -eq "Yes") {
                 $true
             }
             else {
                 $false
-            }
-            FirmwareVersion    = $Disk.FirmwareVersion
-            FriendlyName       = $Disk.Caption
-            Guid               = ($DiskPart | where DiskNumber -eq $Disk.Index).DiskID
-            IsBoot             = if (($DiskPart | where DiskNumber -eq $Disk.Index).BootDisk -eq "Yes") {
+            })
+        $OutPut | Add-Member -MemberType NoteProperty -Name "FirmwareVersion" -Value $Disk.FirmwareVersion
+            $OutPut | Add-Member -MemberType NoteProperty -Name "FriendlyName" -Value $Disk.Caption
+            $OutPut | Add-Member -MemberType NoteProperty -Name "Guid" -Value ($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).DiskID
+            $OutPut | Add-Member -MemberType NoteProperty -Name "IsBoot" -Value $(if (($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).BootDisk -eq "Yes") {
                 $true
             }
             else {
                 $false
-            }
-            IsClustered        = if (($DiskPart | where DiskNumber -eq $Disk.Index).ClusteredDisk -eq "Yes") {
+            })
+        $OutPut | Add-Member -MemberType NoteProperty -Name "IsClustered" -Value $(if (($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).ClusteredDisk -eq "Yes") {
                 $true
             }
             else {
                 $false
-            }
-            IsOffline          = if (($DiskPart | where DiskNumber -eq $Disk.Index).Status -eq "Online") {
+            })
+            $OutPut | Add-Member -MemberType NoteProperty -Name "IsOffline" -Value $(if (($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).Status -eq "Online") {
                 $false
             }
             else {
                 $true
-            }
-            IsReadOnly         = if (($DiskPart | where DiskNumber -eq $Disk.Index).ReadOnly -eq "Yes") {
+            })
+            $OutPut | Add-Member -MemberType NoteProperty -Name "IsReadOnly" -Value $(if (($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).ReadOnly -eq "Yes") {
                 $true
             }
             else {
                 $false
-            }
-            Location           = $Location
-            LogicalSectorSize  = $Disk.BytesPerSector
-            FreeSpace          = ($DiskPart | where DiskNumber -eq $Disk.Index).Free
-            Manufacturer       = $Disk.Manufacturer
-            Model              = $Disk.Model
-            Number             = $Disk.Index
-            NumberOfPartitions = (Get-Partition -DiskNumber $Disk.Index).count
-            SerialNumber       = $Disk.SerialNumber
-            Free               = ($DiskPart | where DiskNumber -eq $Disk.Index).Free
-            Size               = $Disk.Size
-        }
+            })
+            $OutPut | Add-Member -MemberType NoteProperty -Name "Location" -Value $Location
+            $OutPut | Add-Member -MemberType NoteProperty -Name "LogicalSectorSize" -Value $Disk.BytesPerSector
+            $OutPut | Add-Member -MemberType NoteProperty -Name "FreeSpace" -Value ($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).Free
+            $OutPut | Add-Member -MemberType NoteProperty -Name "Manufacturer" -Value $Disk.Manufacturer
+            $OutPut | Add-Member -MemberType NoteProperty -Name "Model" -Value $Disk.Model
+            $OutPut | Add-Member -MemberType NoteProperty -Name "Number" -Value $Disk.Index
+            $OutPut | Add-Member -MemberType NoteProperty -Name "NumberOfPartitions" -Value (Get-Partition -DiskNumber $Disk.Index | Measure).count
+            $OutPut | Add-Member -MemberType NoteProperty -Name "SerialNumber" -Value $Disk.SerialNumber
+            $OutPut | Add-Member -MemberType NoteProperty -Name "Free" -Value ($DiskPart | where {$_.DiskNumber -eq $Disk.Index}).Free
+            $OutPut | Add-Member -MemberType NoteProperty -Name "Size" -Value $Disk.Size
+        
+            $OutPut
     }
 }
 function Get-Partition {
     [cmdletbinding()]
     param(
-        [parameter(ValueFromPipelineByPropertyName)]
+        [parameter(ValueFromPipelineByPropertyName=$true)]
         [Alias("Number")]
         [int32]
         $DiskNumber,
 
-        [parameter(ValueFromPipelineByPropertyName)]
+        [parameter(ValueFromPipelineByPropertyName=$true)]
         [int32]
         $PartitionNumber,
 
@@ -106,7 +107,7 @@ function Get-Partition {
     $Partitions = Get-DiskPartPartition
     $Vols = Get-Volume
 
-    if ($DiskNumber) {
+    if ($PSBoundParameters.ContainsKey("DiskNumber")) {
         $Partitions = $Partitions | where { $_.DiskNumber -eq $DiskNumber }
     }
     if ($PSBoundParameters.ContainsKey("PartitionNumber")) {
@@ -119,23 +120,23 @@ function Get-Partition {
             continue
         }
 
-        [pscustomobject]@{
-            DiskNumber      = $Partition.DiskNumber
-            PartitionNumber = $Partition.PartitionNumber
-            DriveLetter     = $FoundDriveLetter
-            Type            = $($p = $Partition_; $Vol = ($Vols | where { $_.DiskNumber -eq $p.DiskNumber -and $_.PartitionNumber -eq $p.PartitionNumber }); if ($vol.Type -eq "System" -or !$vol) {
+        $OutPut = New-Object PSObject
+        $OutPut | Add-Member -MemberType NoteProperty -Name "DiskNumber" -Value $Partition.DiskNumber
+        $OutPut | Add-Member -MemberType NoteProperty -Name "PartitionNumber" -Value $Partition.PartitionNumber
+        $OutPut | Add-Member -MemberType NoteProperty -Name "DriveLetter" -Value $FoundDriveLetter
+        $OutPut | Add-Member -MemberType NoteProperty -Name "Type" -Value $($p = $Partition_; $Vol = ($Vols | where {$_.DiskNumber -eq $p.DiskNumber -and $_.PartitionNumber -eq $p.PartitionNumber }); if ($vol.Type -eq "System" -or !$vol) {
                     "Reserved"
                 }
                 else {
                     "Basic"
                 })
-            IsSystem        = $($p = $Partition; $Vol = ($Vols | where { $_.DiskNumber -eq $p.DiskNumber -and $_.PartitionNumber -eq $p.PartitionNumber }); if ($vol.Type -eq "System" -or !$vol) {
+        $OutPut | Add-Member -MemberType NoteProperty -Name "IsSystem" -Value $($p = $Partition; $Vol = ($Vols | where {$_.DiskNumber -eq $p.DiskNumber -and $_.PartitionNumber -eq $p.PartitionNumber }); if ($vol.Type -eq "System" -or !$vol) {
                     $true
                 }
                 else {
                     $false
                 })
-            Size            = $($sizeinfo = $Partition.size.split(" "); switch ($sizeinfo[1]) {
+        $OutPut | Add-Member -MemberType NoteProperty -Name "Size" -Value $(if($Partition.Size){$($sizeinfo = $Partition.size.split(" "); switch ($sizeinfo[1]) {
                     "GB" {
                         ([int]$SizeInfo[0] * 1073741824)
                     }"MB" {
@@ -143,34 +144,31 @@ function Get-Partition {
                     }default {
                         $SizeInfo[0]
                     }
-                })
-        }
+                })})
+        $OutPut
     }
 }
 function Get-PartitionSupportedSize {
     [cmdletbinding()]
     param(
-        [parameter(ValueFromPipelineByPropertyName)]
+        [parameter(ValueFromPipelineByPropertyName=$true)]
         [int32]
         $DiskNumber,
 
-        [parameter(ValueFromPipelineByPropertyName)]
+        [parameter(ValueFromPipelineByPropertyName=$true)]
         [int32]
         $PartitionNumber
     )
 
-    $Disks = Get-CimInstance -ClassName Win32_DiskDrive
+    $Disks = Get-WmiObject Win32_DiskDrive
+    $Parts = Get-WmiObject Win32_DiskPartition
 
-    if ($DiskNumber) {
-        $Disks = $Disks | where { $_.Index -eq $DiskNumber }
-    }
-
-    $Parts = Get-CimInstance -ClassName Win32_DiskPartition
-    if ($DiskNumber) {
+    if ($PSBoundParameters.ContainsKey("DiskNumber")) {
+        $Disks = $Disks | where {$_.Index -eq $DiskNumber }
         $Parts = $Parts | where { $_.DiskIndex -eq $DiskNumber }
     }
 
-    if ($PartitionNumber) {
+    if ($PSBoundParameters.ContainsKey("PartitionNumber")) {
         $Parts = $parts | where { if ($_.type -like "*gpt*") {
                 $_.index -eq $PartitionNumber - 2
             }
@@ -180,28 +178,29 @@ function Get-PartitionSupportedSize {
     }
 
     foreach ($Part in $Parts) {
-        [pscustomobject]@{
-            SizeMax = $($PartitionSize = $_.Size - $_.StartingOffset
+
+        $OutPut = New-Object PSObject
+        $OutPut | Add-Member -MemberType NoteProperty -Name "SizeMax" -Value $($PartitionSize = $Part.Size - $Part.StartingOffset
                 $DiskSize = ($Disks | where { $_.Index -eq $part.diskIndex }).size
-                if (($parts | where Diskindex -eq $part.diskindex | measure -Maximum index).maximum -eq $Part.Index) {
+                if (($parts | where {$_.Diskindex -eq $part.diskindex | measure -Maximum index -ErrorAction SilentlyContinue}).maximum -eq $Part.Index) {
                     $DiskSize
                 }
                 else {
-                    $PartitionSize.size
+                    $PartitionSize
                 })
-            SizeMin = $(0)
-        }
+        $OutPut | Add-Member -MemberType NoteProperty -Name "SizeMin" -Value $(0)
+        $OutPut
     }
 }
 function Get-Volume {
     [cmdletbinding()]
     param(
-        [parameter(ValueFromPipelineByPropertyName)]
+        [parameter(ValueFromPipelineByPropertyName=$true)]
         [Alias("Number")]
         [int32]
         $DiskNumber,
 
-        [parameter(ValueFromPipelineByPropertyName)]
+        [parameter(ValueFromPipelineByPropertyName=$true)]
         [int32]
         $PartitionNumber
     )
@@ -224,13 +223,13 @@ function Get-Volume {
     }
 }
 function Format-Volume {
-    [cmdletbinding(SupportsShouldProcess)]
+    [cmdletbinding(SupportsShouldProcess=$true)]
     param(
         [ValidateSet("NTFS")]
         [string]
         $FileSystem,
 
-        [Parameter(Mandatory, ValueFromPipeline)]
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
         $Partition
     )
 
@@ -246,15 +245,15 @@ function Format-Volume {
 function Set-Partition {
     [cmdletbinding()]
     param(
-        [parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [int32]
         $DiskNumber,
 
-        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [int32]
         $PartitionNumber,
 
-        [parameter(Mandatory)]
+        [parameter(Mandatory=$true)]
         [char]
         $NewDriveLetter
     )
@@ -277,7 +276,7 @@ function Set-Disk {
         [nullable[bool]]
         $IsReadOnly,
 
-        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         $Number
     )
 
@@ -313,11 +312,11 @@ function Set-Volume {
         [char]
         $DriveLetter,
 
-        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [int32]
         $DiskNumber,
 
-        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [int32]
         $PartitionNumber
     )
@@ -358,11 +357,11 @@ function Set-Volume {
 function Initialize-Disk {
     [cmdletbinding()]
     param(
-        [parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [int32]
         $DiskNumber,
 
-        [parameter(Mandatory)]
+        [parameter(Mandatory=$true)]
         [ValidateSet("GPT", "MBR")]
         [string]
         $PartitionStyle
@@ -378,7 +377,7 @@ function Initialize-Disk {
 function New-Partition {
     [cmdletbinding()]
     param(
-        [parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [int32]
         $DiskNumber,
 
@@ -419,11 +418,11 @@ function New-Partition {
 function Resize-Partition {
     [cmdletbinding()]
     param(
-        [parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [int]
         $DiskNumber,
 
-        [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory=$true, ValueFromPipelineByPropertyName=$true)]
         [int]
         $PartitionNumber,
 
