@@ -16,3 +16,4 @@ phases:
           baseBuildDefinitionId: 3
           pwsh: false
           coverageThreshold: 15
+          moduleName: StoragePre2K12
