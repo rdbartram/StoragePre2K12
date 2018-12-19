@@ -1,0 +1,18 @@
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: rdbartram/PSBuildRelease
+      ref: refs/heads/master
+      endpoint: rdbartram
+
+phases:
+  - phase: Test
+    queue: Hosted VS2017
+    steps:
+      - template: Yaml Build Defintions/ModuleTest.yml@templates
+        parameters:
+          baseRepoId: rdbartram/StoragePre2K12
+          baseBuildDefinitionId: 3
+          pwsh: false
+          coverageThreshold: 15

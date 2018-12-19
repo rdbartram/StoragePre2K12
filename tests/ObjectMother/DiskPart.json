@@ -1,0 +1,91 @@
+{
+  "Header": [
+    "",
+    "Microsoft DiskPart version 10.0.18298.1000",
+    "",
+    "Copyright (C) Microsoft Corporation.",
+    "On computer: DESKTOP-1B8MN35",
+    ""
+  ],
+  "prompt": "DISKPART\u003e ",
+  "headerListDisk": [
+    "  Disk ###  Status         Size     Free     Dyn  Gpt",
+    "  --------  -------------  -------  -------  ---  ---"
+  ],
+  "disks": [
+    {
+      "id": 0,
+      "list": "  Disk 0    Online          476 GB      0 B        *",
+      "detail": [
+        "Disk 0 is now the selected disk.",
+        "",
+        "DISKPART\u003e ",
+        "SAMSUNG MZFLV512HCJH-000MV",
+        "Disk ID: {DC95B0EE-43ED-43E7-A8D5-6529F88144B1}",
+        "Type   : NVMe",
+        "Status : Online",
+        "Path   : 0",
+        "Target : 0",
+        "LUN ID : 0",
+        "Location Path : PCIROOT(0)#PCI(1D00)#PCI(0000)#NVME(P00T00L00)",
+        "Current Read-only State : No",
+        "Read-only  : No",
+        "Boot Disk  : Yes",
+        "Pagefile Disk  : Yes",
+        "Hibernation File Disk  : No",
+        "Crashdump Disk  : Yes",
+        "Clustered Disk  : No",
+        "",
+        "  Volume ###  Ltr  Label        Fs     Type        Size     Status     Info",
+        "  ----------  ---  -----------  -----  ----------  -------  ---------  --------",
+        "  Volume 0     C   Local Disk   NTFS   Partition    475 GB  Healthy    Boot    ",
+        "  Volume 1         Windows RE   NTFS   Partition   1000 MB  Healthy            ",
+        "  Volume 2         SYSTEM       FAT32  Partition    260 MB  Healthy    System  ",
+        ""
+      ],
+      "uniqueid": [
+        "Disk 0 is now the selected disk.",
+        "",
+        "DISKPART\u003e ",
+        "Disk ID: {DC95B0EE-43ED-43E7-A8D5-6529F88144B1}"
+      ]
+    },
+    {
+      "id": 1,
+      "list": "  Disk 1    Online          476 GB      0 B        *",
+      "detail": [
+        "Disk 1 is now the selected disk.",
+        "",
+        "DISKPART\u003e ",
+        "SAMSUNG MZFLV512HCJH-000MV",
+        "Disk ID: {DC95B0EE-43ED-43E7-A8D5-6529F88144B1}",
+        "Type   : NVMe",
+        "Status : Online",
+        "Path   : 0",
+        "Target : 0",
+        "LUN ID : 1",
+        "Location Path : PCIROOT(0)#PCI(1D00)#PCI(0000)#NVME(P00T00L00)",
+        "Current Read-only State : No",
+        "Read-only  : No",
+        "Boot Disk  : Yes",
+        "Pagefile Disk  : Yes",
+        "Hibernation File Disk  : No",
+        "Crashdump Disk  : Yes",
+        "Clustered Disk  : No",
+        "",
+        "  Volume ###  Ltr  Label        Fs     Type        Size     Status     Info",
+        "  ----------  ---  -----------  -----  ----------  -------  ---------  --------",
+        "  Volume 0     C   Local Disk   NTFS   Partition    475 GB  Healthy    Boot    ",
+        "  Volume 1         Windows RE   NTFS   Partition   1000 MB  Healthy            ",
+        "  Volume 2         SYSTEM       FAT32  Partition    260 MB  Healthy    System  ",
+        ""
+      ],
+      "uniqueid": [
+        "Disk 1 is now the selected disk.",
+        "",
+        "DISKPART\u003e ",
+        "Disk ID: {DC95B0EE-43ED-43E7-A8D5-6529F88144B1}"
+      ]
+    }
+  ]
+}

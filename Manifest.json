@@ -1,0 +1,11 @@
+{
+  "ModuleInfo": {
+    "CompanyName": "DFTAI",
+    "Copyright": "DFTAI 2018",
+    "Author": "Ryan Bartram",
+    "Guid": "593c9a28-2689-4a54-98a0-d73834d0bf3e",
+    "Description": "Emulating functionality of the Storage module in newer version of windows by means of WMI and DiskPart calls.",
+    "tags": ["Powershell", "Storage", "Disk", "DiskPart", "Partition", "Volume"]
+  },
+  "StaticResources": ["Strings"]
+}
