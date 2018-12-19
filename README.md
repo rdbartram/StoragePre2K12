@@ -9,7 +9,7 @@ as part of inplace upgrades going from pre 2012 to post 2012....🚀
 
 🐱‍💻 StoragePre2K12 is built and tested in Azure DevOps and is distributed via the PowerShell gallery.
 
-[![develop](https://img.shields.io/azure-devops/tests/rdbartram/GitHubPipelines/3.svg?label=develop&logo=azuredevops&style=for-the-badge)](https://dev.azure.com/rdbartram/GithubPipelines/_build/latest?definitionId=3?branchName=master)
+[![pester](https://img.shields.io/azure-devops/tests/rdbartram/GitHubPipelines/3.svg?label=pester&logo=azuredevops&style=for-the-badge)](https://dev.azure.com/rdbartram/GithubPipelines/_build/latest?definitionId=3?branchName=master)
 [![latest version](https://img.shields.io/powershellgallery/v/StoragePre2K12.svg?label=latest+version&style=for-the-badge)](https://www.powershellgallery.com/packages/StoragePre2K12)
 [![downloads](https://img.shields.io/powershellgallery/dt/StoragePre2K12.svg?label=downloads&style=for-the-badge)](https://www.powershellgallery.com/packages/StoragePre2K12)
 
