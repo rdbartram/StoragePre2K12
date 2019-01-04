@@ -6,7 +6,7 @@ resources:
       ref: refs/heads/master
       endpoint: rdbartram
 
-Jobs:
+jobs:
   - template: Yaml Build Defintions/ModuleTest.yml@templates
     parameters:
       baseRepoId: rdbartram/StoragePre2K12
