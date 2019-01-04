@@ -27,7 +27,11 @@ Param (
 
     [Parameter()]
     [switch]
-    $ResolveDependency
+    $ResolveDependency,
+    
+    [Parameter()]
+    [string[]]
+    $ExcludedTags
 )
 
 process {
