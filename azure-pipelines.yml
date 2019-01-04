@@ -10,15 +10,7 @@ resources:
 jobs:
 - template: Yaml Build Defintions/ModuleTest.yml@templates  # Template reference
   parameters:
-    name: Linux
-    vmImage: 'ubuntu-16.04'
-
-- template: Yaml Build Defintions/ModuleTest.yml@templates  # Template reference
-  parameters:
-    name: macOS
-    vmImage: 'macOS-10.13'
-
-- template: Yaml Build Defintions/ModuleTest.yml@templates  # Template reference
-  parameters:
-    name: Windows
-    vmImage: 'vs2017-win2016'
+    baseRepoId: rdbartram/StoragePre2K12
+    baseBuildDefinitionId: 3
+    coverageThreshold: 15
+    moduleName: StoragePre2K12
