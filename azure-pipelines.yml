@@ -6,14 +6,11 @@ resources:
       ref: refs/heads/master
       endpoint: rdbartram
 
-phases:
-  - phase: Test
-    queue: Hosted VS2017
-    steps:
-      - template: Yaml Build Defintions/ModuleTest.yml@templates
-        parameters:
-          baseRepoId: rdbartram/StoragePre2K12
-          baseBuildDefinitionId: 3
-          pwsh: false
-          coverageThreshold: 15
-          moduleName: StoragePre2K12
+Jobs:
+  - template: Yaml Build Defintions/ModuleTest.yml@templates
+    parameters:
+      baseRepoId: rdbartram/StoragePre2K12
+      baseBuildDefinitionId: 3
+      pwsh: false
+      coverageThreshold: 15
+      moduleName: StoragePre2K12
